@@ -1,0 +1,19 @@
+#pen{
+    width: 20px;
+    height: auto;
+    cursor: pointer;
+}
+#eraser{
+    width: 20px;
+    height: auto;
+    cursor: pointer;
+}
+canvas{
+    cursor: crosshair;
+    border:  2px solid rgb(202, 202, 202);
+  
+}
+#clear{
+    cursor: pointer;
+}
+input{ cursor: pointer;}
