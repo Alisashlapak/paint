@@ -7,7 +7,7 @@ const clearAll = document.getElementById('clear');
 const save = document.getElementById('save');
 const undo = document.getElementById('undo');
 const redo = document.getElementById('redo');
-const circle = document.getElementById('circle');
+const circleBtn = document.getElementById('circle'); // виправлено ID
 
 let mode = 'brush';
 let isDrawing = false;
@@ -21,81 +21,74 @@ ctx.lineWidth = 5;
 ctx.lineCap = 'round';
 ctx.strokeStyle = 'black';
 
-
-function startPosition(e){
-    if (mode!=='brush') return;
+// 🎨 Функція для малювання пензлем
+function startPosition(e) {
+    if (mode !== 'brush') return;
     isDrawing = true;
     ctx.beginPath();
     ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
-    saveState(); }
-
-function endPosition(){
-    isDrawing = false;
-
-   } 
-
-function draw(e){
-    if (!isDrawing || mode!=='brush') return;
-    ctx.strokeStyle = colorPicker.value;
-    ctx.lineWidth = parseInt(brushSize.value, 10);
-    ctx.lineTo(
-        e.clientX - canvas.offsetLeft,
-        e.clientY - canvas.offsetTop
-    );
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(
-        e.clientX - canvas.offsetLeft,
-        e.clientY - canvas.offsetTop
-    );
     saveState();
 }
 
-canvas.addEventListener('mousedown', startPosition);
-canvas.addEventListener('mouseup', endPosition);
-canvas.addEventListener('mousemove', draw);
+function draw(e) {
+    if (!isDrawing || mode !== 'brush') return;
+    ctx.strokeStyle = colorPicker.value;
+    ctx.lineWidth = parseInt(brushSize.value, 10);
+    ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+    ctx.stroke();
+}
 
+function endPosition() {
+    isDrawing = false;
+    saveState();
+}
+
+// Додаємо слухачі для пензля
+canvas.addEventListener('mousedown', startPosition);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', endPosition);
+
+// 🖌 Налаштування пензля
 brushSize.addEventListener('input', () => {
     ctx.lineWidth = parseInt(brushSize.value, 10);
     updateBrushSizeLabel(brushSize.value);
-    saveState();
 });
 
-function updateBrushSizeLabel (size){
+function updateBrushSizeLabel(size) {
     const brushSizeLabel = document.getElementById('brush-size-label');
-    if (brushSizeLabel){
+    if (brushSizeLabel) {
         brushSizeLabel.textContent = `Thickness: ${size}`;
     }
 }
-const pen = document.getElementById('pen');
-const eraser = document.getElementById('eraser');
 
-pen.onclick =() =>{
+// ✍️ Перемикання інструментів
+document.getElementById('pen').onclick = () => {
     mode = 'brush';
     ctx.globalCompositeOperation = 'source-over';
-    ctx.strokeStyle = colorPicker.value;
-}
+};
 
-eraser.onclick =() =>{
+document.getElementById('eraser').onclick = () => {
     mode = 'brush';
     ctx.globalCompositeOperation = 'destination-out';
-}
-
-let startX, startY, currentX, currentY;
-let shiftPressed = false;
+};
 
 circleBtn.onclick = () => {
     mode = 'circle';
-}
+};
 
-document.addEventListener('keydown', (e)=> {
+// 🔵 Малювання кіл та еліпсів
+let startX, startY, currentX, currentY;
+let shiftPressed = false;
+
+// Відстеження клавіші Shift
+document.addEventListener('keydown', (e) => {
     if (e.key === 'Shift') shiftPressed = true;
 });
-
 document.addEventListener('keyup', (e) => {
     if (e.key === 'Shift') shiftPressed = false;
 });
 
+// Початок малювання кола
 canvas.addEventListener('mousedown', (e) => {
     if (mode !== 'circle') return;
     const rect = canvas.getBoundingClientRect();
@@ -104,7 +97,8 @@ canvas.addEventListener('mousedown', (e) => {
     isDrawing = true;
 });
 
-canvas.addEventListener('mousemove', (e) =>{
+// Малювання еліпса в реальному часі
+canvas.addEventListener('mousemove', (e) => {
     if (!isDrawing || mode !== 'circle') return;
     const rect = canvas.getBoundingClientRect();
     currentX = e.clientX - rect.left;
@@ -116,51 +110,106 @@ canvas.addEventListener('mousemove', (e) =>{
     let width = currentX - startX;
     let height = currentY - startY;
 
-    if(shiftPressed){
+    if (shiftPressed) {
         let size = Math.max(Math.abs(width), Math.abs(height));
-        width = width < 0 ? - size : size;
-        height = height < 0 ? - size : size;
+        width = width < 0 ? -size : size;
+        height = height < 0 ? -size : size;
     }
-    ctx.elipse(
-        startX + width/2,
-        startY + height/2,
-        Math.abs(width)/2,
-        Math.abs(height)/2,
+
+    ctx.ellipse(
+        startX + width / 2,
+        startY + height / 2,
+        Math.abs(width) / 2,
+        Math.abs(height) / 2,
         0,
         0,
-        2*Math.PI
+        2 * Math.PI
     );
     ctx.stroke();
-})
+});
+
+// Завершення малювання кола
+canvas.addEventListener('mouseup', () => {
+    if (mode !== 'circle') return;
+    isDrawing = false;
+    shapes.push({
+        x: startX,
+        y: startY,
+        width: currentX - startX,
+        height: currentY - startY,
+        isCircle: shiftPressed,
+        color: ctx.strokeStyle,
+        lineWidth: ctx.lineWidth,
+    });
+    saveState();
+});
+
+// 🔄 Функція перемальовування всіх фігур
+function redrawCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    shapes.forEach((shape) => {
+        ctx.beginPath();
+        let { x, y, width, height, isCircle, color, lineWidth } = shape;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lineWidth;
+
+        if (isCircle) {
+            let size = Math.max(Math.abs(width), Math.abs(height));
+            width = width < 0 ? -size : size;
+            height = height < 0 ? -size : size;
+        }
+
+        ctx.ellipse(
+            x + width / 2,
+            y + height / 2,
+            Math.abs(width) / 2,
+            Math.abs(height) / 2,
+            0,
+            0,
+            2 * Math.PI
+        );
+
+        ctx.stroke();
+    });
+}
+
+// 🎨 Функція збереження стану
+function saveState() {
+    history.push(canvas.toDataURL());
+    redoStack = [];
+}
+
+// 🖼 Збереження зображення
 save.onclick = () => {
     const link = document.createElement('a');
-    link.href = canvas.toDataURL(); 
+    link.href = canvas.toDataURL();
     link.download = 'drawing.png';
     link.click();
 };
 
-clearAll.onclick=()=>{
+// 🔄 Очистити холст
+clearAll.onclick = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     shapes = [];
     saveState();
 };
 
-function saveState() {
-    history.push(canvas.toDataURL());
-    redoStack = [];}
-
-undo.onclick = () =>{
-    if(history.length > 0){
+// ↩️ Undo
+undo.onclick = () => {
+    if (history.length > 0) {
         redoStack.push(canvas.toDataURL());
         let previousState = history.pop();
         let img = new Image();
         img.src = previousState;
-        img.onload = () =>{
+        img.onload = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(img, 0, 0);
-        }
+        };
     }
-}
+};
+
+// ↪️ Redo
 redo.onclick = () => {
     if (redoStack.length > 0) {
         let redoState = redoStack.pop();
@@ -171,6 +220,5 @@ redo.onclick = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(img, 0, 0);
         };
-    }}
- 
-    
+    }
+};
