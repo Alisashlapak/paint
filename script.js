@@ -8,6 +8,7 @@ const save = document.getElementById('save');
 const undo = document.getElementById('undo');
 const redo = document.getElementById('redo');
 const circleBtn = document.getElementById('circle'); // виправлено ID
+const triangleBtn = document.getElementById('triangle');
 
 let mode = 'brush';
 let isDrawing = false;
@@ -75,7 +76,9 @@ document.getElementById('eraser').onclick = () => {
 circleBtn.onclick = () => {
     mode = 'circle';
 };
-
+triangleBtn.onclick = () => {
+    mode = 'triangle';
+}
 // 🔵 Малювання кіл та еліпсів
 let startX, startY, currentX, currentY;
 let shiftPressed = false;
@@ -87,19 +90,18 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('keyup', (e) => {
     if (e.key === 'Shift') shiftPressed = false;
 });
+const modes = ['circle', 'triangle', 'rectangle'];
 
-// Початок малювання кола
 canvas.addEventListener('mousedown', (e) => {
-    if (mode !== 'circle') return;
+    if (!modes.includes(mode)) return;
     const rect = canvas.getBoundingClientRect();
     startX = e.clientX - rect.left;
     startY = e.clientY - rect.top;
     isDrawing = true;
 });
 
-// Малювання еліпса в реальному часі
 canvas.addEventListener('mousemove', (e) => {
-    if (!isDrawing || mode !== 'circle') return;
+    if (!isDrawing || !modes.includes(mode)) return;
     const rect = canvas.getBoundingClientRect();
     currentX = e.clientX - rect.left;
     currentY = e.clientY - rect.top;
@@ -116,59 +118,66 @@ canvas.addEventListener('mousemove', (e) => {
         height = height < 0 ? -size : size;
     }
 
-    ctx.ellipse(
-        startX + width / 2,
-        startY + height / 2,
-        Math.abs(width) / 2,
-        Math.abs(height) / 2,
-        0,
-        0,
-        2 * Math.PI
-    );
-    ctx.stroke();
-});
-
-// Завершення малювання кола
-canvas.addEventListener('mouseup', () => {
-    if (mode !== 'circle') return;
-    isDrawing = false;
-    shapes.push({
-        x: startX,
-        y: startY,
-        width: currentX - startX,
-        height: currentY - startY,
-        isCircle: shiftPressed,
-        color: ctx.strokeStyle,
-        lineWidth: ctx.lineWidth,
-    });
-    saveState();
-});
-
-// 🔄 Функція перемальовування всіх фігур
-function redrawCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    shapes.forEach((shape) => {
-        ctx.beginPath();
-        let { x, y, width, height, isCircle, color, lineWidth } = shape;
-        ctx.strokeStyle = color;
-        ctx.lineWidth = lineWidth;
-
-        if (isCircle) {
-            let size = Math.max(Math.abs(width), Math.abs(height));
-            width = width < 0 ? -size : size;
-            height = height < 0 ? -size : size;
-        }
-
+    if (mode === 'circle') {
         ctx.ellipse(
-            x + width / 2,
-            y + height / 2,
+            startX + width / 2,
+            startY + height / 2,
             Math.abs(width) / 2,
             Math.abs(height) / 2,
             0,
             0,
             2 * Math.PI
         );
+    } else if (mode === 'triangle') {
+        ctx.moveTo(startX + width / 2, startY);
+        ctx.lineTo(startX, startY + height);
+        ctx.lineTo(startX + width, startY + height);
+        ctx.closePath();
+    }
+
+    ctx.stroke();
+});
+
+canvas.addEventListener('mouseup', () => {
+    if (!modes.includes(mode)) return;
+    isDrawing = false;
+    shapes.push({
+        x: startX,
+        y: startY,
+        width: currentX - startX,
+        height: currentY - startY,
+        type: mode,
+        color: ctx.strokeStyle,
+        lineWidth: ctx.lineWidth,
+    });
+    saveState();
+});
+
+function redrawCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    shapes.forEach((shape) => {
+        ctx.beginPath();
+        let { x, y, width, height, type, color, lineWidth } = shape;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lineWidth;
+
+        if (type === 'circle') {
+            ctx.ellipse(
+                x + width / 2,
+                y + height / 2,
+                Math.abs(width) / 2,
+                Math.abs(height) / 2,
+                0,
+                0,
+                2 * Math.PI
+            );
+        } else if (type === 'triangle') {
+            ctx.moveTo(x + width / 2, y);
+            ctx.lineTo(x, y + height);
+            ctx.lineTo(x + width, y + height);
+            ctx.closePath();
+        }
 
         ctx.stroke();
     });
