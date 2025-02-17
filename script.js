@@ -9,6 +9,8 @@ const undo = document.getElementById('undo');
 const redo = document.getElementById('redo');
 const circleBtn = document.getElementById('circle'); // виправлено ID
 const triangleBtn = document.getElementById('triangle');
+const rectangleBtn = document.getElementById('rectangle');
+const diamondBtn = document.getElementById('diamond');
 
 let mode = 'brush';
 let isDrawing = false;
@@ -79,6 +81,12 @@ circleBtn.onclick = () => {
 triangleBtn.onclick = () => {
     mode = 'triangle';
 }
+rectangleBtn.onclick =() => {
+    mode = 'rectangle';
+}
+diamondBtn.onclick =() =>{
+    mode = 'diamond';
+}
 // 🔵 Малювання кіл та еліпсів
 let startX, startY, currentX, currentY;
 let shiftPressed = false;
@@ -90,7 +98,7 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('keyup', (e) => {
     if (e.key === 'Shift') shiftPressed = false;
 });
-const modes = ['circle', 'triangle', 'rectangle'];
+const modes = ['circle', 'triangle', 'rectangle', 'diamond'];
 
 canvas.addEventListener('mousedown', (e) => {
     if (!modes.includes(mode)) return;
@@ -133,6 +141,18 @@ canvas.addEventListener('mousemove', (e) => {
         ctx.lineTo(startX, startY + height);
         ctx.lineTo(startX + width, startY + height);
         ctx.closePath();
+    } else if (mode === 'rectangle'){
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(startX, startY+height);
+        ctx.lineTo(startX+width, startY+height);
+        ctx.lineTo(startX+width, startY);
+        ctx.closePath();
+    } else if (mode === 'diamond'){
+        ctx.moveTo(startX + width / 2, startY);
+        ctx.lineTo(startX, startY+height / 2);
+        ctx.lineTo(startX + width / 2, startY+height);
+        ctx.lineTo(startX+width, startY + height / 2)
+        ctx.closePath()
     }
 
     ctx.stroke();
@@ -177,11 +197,24 @@ function redrawCanvas() {
             ctx.lineTo(x, y + height);
             ctx.lineTo(x + width, y + height);
             ctx.closePath();
+        } else if (type === 'rectangle') {
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, y + height);
+            ctx.lineTo(x + width, y + height);
+            ctx.lineTo(x + width, y);
+            ctx.closePath();
+        } else if (type === 'diamond') {
+            ctx.moveTo(x + width / 2, y);
+            ctx.lineTo(x, y + height / 2);
+            ctx.lineTo(x + width / 2, y + height);
+            ctx.lineTo(x + width, y + height / 2);
+            ctx.closePath();
         }
 
         ctx.stroke();
     });
 }
+
 
 // 🎨 Функція збереження стану
 function saveState() {
