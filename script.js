@@ -11,12 +11,16 @@ const circleBtn = document.getElementById('circle'); // виправлено ID
 const triangleBtn = document.getElementById('triangle');
 const rectangleBtn = document.getElementById('rectangle');
 const diamondBtn = document.getElementById('diamond');
+const fill = document.getElementById('fill');
+const bgColor = document.getElementById('back');
 
 let mode = 'brush';
 let isDrawing = false;
 let history = [];
 let redoStack = [];
 let shapes = [];
+let isFillEnabled = false;
+let fillColor = null;
 
 canvas.width = window.innerWidth - 40;
 canvas.height = window.innerHeight * 0.85;
@@ -86,6 +90,15 @@ rectangleBtn.onclick =() => {
 }
 diamondBtn.onclick =() =>{
     mode = 'diamond';
+   
+}
+
+fill.onclick =()=>{
+    isFillEnabled = !isFillEnabled; // Включаємо або вимикаємо заливку
+    fillColor = isFillEnabled ? colorPicker.value : null;
+}
+bgColor.onclick=()=>{
+    canvas.style.backgroundColor = colorPicker.value;
 }
 // 🔵 Малювання кіл та еліпсів
 let startX, startY, currentX, currentY;
@@ -136,26 +149,50 @@ canvas.addEventListener('mousemove', (e) => {
             0,
             2 * Math.PI
         );
+        ctx.strokeStyle = colorPicker.value;
+        ctx.lineWidth = brushSize.value;
+        ctx.stroke();
+        isFillEnabled && ctx.fill();
+
+       
     } else if (mode === 'triangle') {
         ctx.moveTo(startX + width / 2, startY);
         ctx.lineTo(startX, startY + height);
         ctx.lineTo(startX + width, startY + height);
         ctx.closePath();
+        ctx.strokeStyle = colorPicker.value;
+        ctx.lineWidth = brushSize.value;
+        ctx.stroke();
+        isFillEnabled && ctx.fill();
+
     } else if (mode === 'rectangle'){
         ctx.moveTo(startX, startY);
         ctx.lineTo(startX, startY+height);
         ctx.lineTo(startX+width, startY+height);
         ctx.lineTo(startX+width, startY);
         ctx.closePath();
+        ctx.strokeStyle = colorPicker.value;
+        ctx.lineWidth = brushSize.value;
+        ctx.stroke();
+        isFillEnabled && ctx.fill();
+
     } else if (mode === 'diamond'){
         ctx.moveTo(startX + width / 2, startY);
         ctx.lineTo(startX, startY+height / 2);
         ctx.lineTo(startX + width / 2, startY+height);
         ctx.lineTo(startX+width, startY + height / 2)
         ctx.closePath()
-    }
+        ctx.strokeStyle = colorPicker.value;
+        ctx.lineWidth = brushSize.value;
+        ctx.stroke();
+        isFillEnabled && ctx.fill();
 
+    }
+    
     ctx.stroke();
+    
+    saveState();
+
 });
 
 canvas.addEventListener('mouseup', () => {
@@ -167,9 +204,11 @@ canvas.addEventListener('mouseup', () => {
         width: currentX - startX,
         height: currentY - startY,
         type: mode,
-        color: ctx.strokeStyle,
+        strokeColor: ctx.strokeStyle, // Колір контуру
         lineWidth: ctx.lineWidth,
+        fillColor: fillColor
     });
+    saveState();
     saveState();
 });
 
@@ -178,9 +217,11 @@ function redrawCanvas() {
 
     shapes.forEach((shape) => {
         ctx.beginPath();
-        let { x, y, width, height, type, color, lineWidth } = shape;
-        ctx.strokeStyle = color;
-        ctx.lineWidth = lineWidth;
+        ctx.strokeStyle = shape.strokeColor;
+        ctx.lineWidth = shape.lineWidth;
+        ctx.fillStyle = shape.fillColor || "transparent"; // Використовуємо збережений колір
+
+        let { x, y, width, height, type } = shape;
 
         if (type === 'circle') {
             ctx.ellipse(
@@ -198,11 +239,7 @@ function redrawCanvas() {
             ctx.lineTo(x + width, y + height);
             ctx.closePath();
         } else if (type === 'rectangle') {
-            ctx.moveTo(x, y);
-            ctx.lineTo(x, y + height);
-            ctx.lineTo(x + width, y + height);
-            ctx.lineTo(x + width, y);
-            ctx.closePath();
+            ctx.rect(x, y, width, height);
         } else if (type === 'diamond') {
             ctx.moveTo(x + width / 2, y);
             ctx.lineTo(x, y + height / 2);
@@ -211,9 +248,15 @@ function redrawCanvas() {
             ctx.closePath();
         }
 
+        if (shape.fillColor) {
+            ctx.fill(); // Заливаємо, якщо є колір заливки
+        }
+
         ctx.stroke();
     });
 }
+
+
 
 
 // 🎨 Функція збереження стану
