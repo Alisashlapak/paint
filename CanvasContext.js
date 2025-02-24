@@ -87,6 +87,7 @@ class CanvasContext extends Stack {
           this.ctx.ellipse(startX + width / 2, startY + height / 2, Math.abs(width) / 2, Math.abs(height) / 2, 0, 0, 2 * Math.PI);
           this.ctx.closePath();
           this.ctx.stroke();
+          this.ctx.fill();
         }
       }
     },
@@ -110,6 +111,7 @@ class CanvasContext extends Stack {
           this.ctx.rect(startX, startY, width, height);
           this.ctx.closePath();
           this.ctx.stroke();
+          this.ctx.fill();
         }
       }
 
@@ -137,6 +139,7 @@ class CanvasContext extends Stack {
           this.ctx.lineTo(startX + width, startY + height / 2);
           this.ctx.closePath();
           this.ctx.stroke();
+          this.ctx.fill();
 
         }
       }
@@ -165,6 +168,7 @@ class CanvasContext extends Stack {
         this.ctx.lineTo(startX + width, startY + height);
         this.ctx.closePath();
         this.ctx.stroke();
+        this.ctx.fill();
       }
     }
   }
@@ -299,5 +303,6 @@ class CanvasContext extends Stack {
     this.ctx.strokeStyle = this.#currentColor;
     this.ctx.lineWidth = this.#strokeWidth;
     this.#modes[this.#currentMode](event)
+    this.ctx.fillStyle = context.fill ? context.currentColor : "transparent";
   }
 }

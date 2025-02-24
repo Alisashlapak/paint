@@ -5,6 +5,8 @@ const [undo, redo] = [document.getElementById('undo'), document.getElementById('
 const fill = document.getElementById('fill')
 const strokeSize = document.getElementById('brush-size');
 const strokeSizeLabel = document.getElementById('brush-size-label');
+const bgColor = document.getElementById('bg');
+const fillCheckbox = document.getElementById('fill-checkbox');
 
 canvas.width = window.innerWidth - 40;
 canvas.height = window.innerHeight * 0.85;
@@ -82,12 +84,19 @@ strokeSize.oninput = ({
 }) => {
     const value = +target.value
     context.strokeWidth = value;
-    strokeSizeLabel.innerText = `Thickness: ${value}`;
+    strokeSizeLabel.innerText = `${value}`;
 }
 
-fill.onclick = () => {
-    console.log(context.fill)
-    context.fill = !context.fill;
+fillCheckbox.onchange = () => {
+    context.fill = fillCheckbox.checked;
+    if (context.fill) {
+        context.ctx.fillStyle = context.currentColor;
+    } else {
+        context.ctx.fillStyle = "transparent";
+    }
+};
+bgColor.onclick = () => {
+    canvas.style.backgroundColor = context.currentColor;
 }
 
 undo.onclick = Undo;

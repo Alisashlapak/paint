@@ -12,23 +12,38 @@
     <canvas id="canvas"></canvas>
 
     <div id="tools">
-        <label for="brush-size" id="brush-size-label">Thickness: 1</label>
-        <input type="range" id="brush-size" min="1" max="30" value="1">
+        <button id="bg">BG</button>
+         <select id="modes">
+            <option value="brush">◾Brush</option>
+            <option value="eraser">▫️Eraser</option>
+            <option value="circle">  〇 Circle</option>
+            <option value="triangle"> △Triangle</option>
+            <option value="rectangle"> ◻ Rectangle</option>
+            <option value="diamond"> ♢ Diamond</option>
+        </select> 
         <input type="color" id="color-picker">
-        <img src="remove.svg" id="eraser" alt="Select Eraser Tool">
-        <img src="ArrowUndoUpLeftIcon.svg" id="undo">
-        <img src="ArrowUndoUpRightIcon.svg" id="redo">
-        <img src="DownoadIcon.svg" id="save">
-        <img src="redo-svgrepo-com.svg" id="clear">
-        <select id="modes">
-            <option value="brush">🖌 Brush</option>
-            <option value="circle">⚫ Circle</option>
-            <option value="triangle">🔺 Triangle</option>
-            <option value="rectangle">▭ Rectangle</option>
-            <option value="diamond">♦ Diamond</option>
-        </select>
+        
+        
+       
 
-        <button id="fill">fill</button>
+        <button id="save"><img src="DownoadIcon.svg"></button>
+        <button id="clear"><img src="redo-24.svg" id="imgClear"></button>
+        
+        
+       
+          
+
+          <button id="undo"><img src="ArrowUndoUpLeftIcon.svg"></button>
+          <button id="redo"><img src="ArrowUndoUpRightIcon.svg"></button>
+          <div id="brushwidth"><label for="brush-size" id="brush-size-label">1</label>
+            <input type="range" id="brush-size" min="1" max="30" value="1">
+            <button id="fill">
+                <label for="fill-checkbox" class="switch">
+                  <input type="checkbox" id="fill-checkbox">
+                  <span class="slider round"></span>
+                </label>
+              </button>
+            </div>
     </div>
     <script src="CanvasContext.js"></script>
     <script defer src="script.js"></script>
