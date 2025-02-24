@@ -1,32 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="styles.css" rel="stylesheet">
     <title>Canvas Drawing</title>
 </head>
+
 <body>
     <canvas id="canvas"></canvas>
 
     <div id="tools">
-        <label for="brush-size" id="brush-size-label">Thickness: 5</label>
-        <input type="range" id="brush-size" min="1" max="50" value="5">
+        <label for="brush-size" id="brush-size-label">Thickness: 1</label>
+        <input type="range" id="brush-size" min="1" max="30" value="1">
         <input type="color" id="color-picker">
-        <img src="—Pngtree—pencil line black icon_3746331.png" id="pen" alt="Select Brush Tool">
         <img src="remove.svg" id="eraser" alt="Select Eraser Tool">
         <img src="ArrowUndoUpLeftIcon.svg" id="undo">
         <img src="ArrowUndoUpRightIcon.svg" id="redo">
         <img src="DownoadIcon.svg" id="save">
         <img src="redo-svgrepo-com.svg" id="clear">
-        <button id="circle">circle</button>
-        <button id="triangle">triangle</button>
-        <button id="rectangle">rectangle</button>
-        <button id="diamond">diamond</button>
-        <button id="fill">fill</button>
-        <button id="back">bg-color</button>
-    </div>
-    <script src="script.js"></script>
-</body>
-</html>
+        <select id="modes">
+            <option value="brush">🖌 Brush</option>
+            <option value="circle">⚫ Circle</option>
+            <option value="triangle">🔺 Triangle</option>
+            <option value="rectangle">▭ Rectangle</option>
+            <option value="diamond">♦ Diamond</option>
+        </select>
 
+        <button id="fill">fill</button>
+    </div>
+    <script src="CanvasContext.js"></script>
+    <script defer src="script.js"></script>
+</body>
+
+</html>
