@@ -7,6 +7,8 @@ const strokeSize = document.getElementById('brush-size');
 const strokeSizeLabel = document.getElementById('brush-size-label');
 const bgColor = document.getElementById('bg');
 const fillCheckbox = document.getElementById('fill-checkbox');
+const savePic = document.getElementById('save');
+const clear = document.getElementById('clear');
 
 canvas.width = window.innerWidth - 40;
 canvas.height = window.innerHeight * 0.85;
@@ -77,6 +79,18 @@ const Redo = () => {
         }
     }
 }
+const clearAll = () => {
+    context.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    context.state = canvas.toDataURL(); 
+};
+
+const saveToFile = () => {
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL("image/png"); 
+    link.download = "drawing.png"; 
+    link.click(); 
+};
+
 
 strokeSize.oninput = ({
     target
@@ -100,3 +114,5 @@ bgColor.onclick = () => {
 
 undo.onclick = Undo;
 redo.onclick = Redo;
+clear.onclick = clearAll;
+savePic.onclick = saveToFile;
