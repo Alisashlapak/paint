@@ -15,7 +15,6 @@ const context = new CanvasContext(canvas);
 
 context.state = context.canvas.toDataURL();
 
-
 canvas.onmouseenter = () => {
     canvas.onmousedown = (e) => {
 
@@ -27,8 +26,8 @@ canvas.onmouseenter = () => {
             startY: e.clientY - rect.top
         }
 
-        if (context.currentMode == "brush") context.ctx.beginPath();
-    
+        if (context.currentMode == "brush" || context.currentMode == "eraser") context.ctx.beginPath();
+
         const image = new Image();
         image.src = context.state;
         canvas.onmousemove = (e) => {
@@ -40,7 +39,7 @@ canvas.onmouseenter = () => {
             }
             context.draw(e)
         }
-        if (context.currentMode == "brush") context.ctx.closePath();
+        if (context.currentMode == "brush" || context.currentMode == "eraser") context.ctx.closePath();
     };
     canvas.onmouseup = () => {
         context.state = context.canvas.toDataURL();
