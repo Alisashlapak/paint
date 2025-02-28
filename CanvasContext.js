@@ -1,5 +1,5 @@
 /**
- * @typedef {'brush' | 'circle' | 'triangle' | 'rectangle' | 'diamond'} Mode
+ * @typedef {'brush' | 'circle' | 'triangle' | 'rectangle' | 'diamond' | 'eraser'} Mode
  */
 
 
@@ -63,9 +63,15 @@ class CanvasContext extends Stack {
     brush: (event) => {
       this.ctx.lineTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
       this.ctx.stroke();
+      
+    },
+    eraser: (event) => {
+      
+      this.ctx.strokeStyle= "#FFFFFF";
+      this.ctx.lineTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+      this.ctx.stroke();
 
     },
-
     circle: (event) => {
       const rect = this.canvas.getBoundingClientRect();
       const currentX = event.clientX - rect.left;

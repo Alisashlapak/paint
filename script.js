@@ -28,7 +28,7 @@ canvas.onmouseenter = () => {
         }
 
         if (context.currentMode == "brush") context.ctx.beginPath();
-
+    
         const image = new Image();
         image.src = context.state;
         canvas.onmousemove = (e) => {
